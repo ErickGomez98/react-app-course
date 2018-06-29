@@ -5,19 +5,31 @@ import Person from './Person/Person';
 class App extends Component {
   state = {
     persons: [
-      {name: 'Max', age: 28},
-      {name: 'Erick', age: 19}
+      {id: 1, name: 'Max', age: 28},
+      {id: 2, name: 'Erick', age: 19}
     ],
     ohterState: 'Some other value',
     showPersons: false
   };
 
-  nameChangedHandler = (event) => {
+  nameChangedHandler = (event, id) => {
+
+    // Es como la función de .map(), recibe una función para hacer una comparación, y regresa true o false si lo encontró
+    // o no en base a la comparación que le asignamos.
+    const personIndex = this.state.persons.findIndex(p => {
+      return p.id === id;
+    });
+
+    // Hay que crear una copia del objeto de la persona que se encontro mediante el index para no modificar el original
+    const person = {...this.state.persons[personIndex]};
+    person.name = event.target.value;
+
+    // Después creamos una copia de tod0 el array de personas, y en base al index, solo modificamos ese objeto (persona)
+    const persons = [...this.state.persons];
+    persons[personIndex] = person;
+
     this.setState({
-      persons: [
-        {name: 'Max', age: 28},
-        {name: event.target.value, age: 19}
-      ]
+      persons: persons
     });
   };
 
@@ -62,7 +74,9 @@ class App extends Component {
               return <Person
                   click={this.deletePersonHandler.bind(this, index)}
                   name={person.name}
-                  age={person.age}/>
+                  age={person.age}
+                  key={person.id}
+                  changed={(event) => this.nameChangedHandler(event, person.id)}/>
             })}
           </div>
       );
