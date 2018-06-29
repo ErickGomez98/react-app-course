@@ -12,15 +12,6 @@ class App extends Component {
     showPersons: false
   };
 
-  switchNameHandler = (newName) => {
-    this.setState({
-      persons: [
-        {name: newName, age: 28},
-        {name: 'Erick Gómez', age: 19}
-      ]
-    });
-  };
-
   nameChangedHandler = (event) => {
     this.setState({
       persons: [
@@ -38,6 +29,21 @@ class App extends Component {
     });
   };
 
+  deletePersonHandler = (personIndex) => {
+    /* Hacerlo de esta manera esta mal, porque se esta modificando el valor original de this.state.persons y
+     no debe de ser asi, por lo tanto se tiene que crear una copia y ahora si manipularlo.
+    const persons = this.state.persons;
+    */
+
+    // Entonces para hacer una copia, simplemente se usa el spread operator (...)
+    const persons = [...this.state.persons];
+
+    persons.splice(personIndex, 1);
+    this.setState({
+      persons: persons
+    });
+  };
+
   render() {
     const style = {
       backgroundColor: 'white',
@@ -51,28 +57,26 @@ class App extends Component {
 
     if (this.state.showPersons) {
       persons = (
-        <div>
-          <Person
-            name={this.state.persons[0].name}
-            age={this.state.persons[0].age}/>
-          <Person
-            name={this.state.persons[1].name}
-            age={this.state.persons[1].age}
-            click={this.switchNameHandler.bind(this, 'MaX!!!!')}
-            changed={this.nameChangedHandler}>My hobbies: Racing</Person>
-        </div>
+          <div>
+            {this.state.persons.map((person, index) => {
+              return <Person
+                  click={this.deletePersonHandler.bind(this, index)}
+                  name={person.name}
+                  age={person.age}/>
+            })}
+          </div>
       );
     }
 
     return (
-      <div className='App'>
-        <h1>Hi I'm a React App</h1>
-        <button
-          style={style}
-          onClick={this.togglePersonsHandler}>Toggle Persons
-        </button>
-        {persons}
-      </div>
+        <div className='App'>
+          <h1>Hi I am a React App</h1>
+          <button
+              style={style}
+              onClick={this.togglePersonsHandler}>Toggle Persons
+          </button>
+          {persons}
+        </div>
     );
   }
 }
